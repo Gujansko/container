@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
-import Note from "./models/Note.js";
 
 const app = express();
 
@@ -9,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 mongoose
-  .connect(process.env.MONGO_URL, {
+  .connect("mongodb://mongo:27017/mydb", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -20,29 +19,34 @@ mongoose
     console.log(err);
   });
 
-app.get("/notes", async (req, res) => {
+app.get("/", async (req, res) => {
   try {
-    const notes = await Note.find();
-    res.status(200).json(notes);
+    fetch(
+      "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/%C5%81%C3%B3d%C5%BA%2C%2010%2C%20PL/today?unitGroup=metric&include=obs%2Ccurrent&key=AYV277Z85K8LCTMK9P8TQHG3X&contentType=json",
+      {
+        method: "GET",
+        headers: {},
+      }
+    )
+      .then(async (response) => {
+        const responseJson = await response.json();
+        const data = {
+          conditions: responseJson.currentConditions.conditions,
+          temperature: responseJson.currentConditions.temp,
+          wind: responseJson.currentConditions.windspeed,
+          humidity: responseJson.currentConditions.humidity,
+        };
+        res.status(200).json(data);
+      })
+      .catch((err) => {
+        res
+          .status(500)
+          .json({ message: "Failed to fetch weather data from server" });
+      });
   } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-});
-
-app.post("/notes", async (req, res) => {
-  if (!req.body.title || !req.body.content) {
-    return res.status(400).json({ message: "Invalid data" });
-  }
-  const note = new Note({
-    title: req.body.title,
-    content: req.body.content,
-  });
-
-  try {
-    const savedNote = await note.save();
-    res.status(201).json(savedNote);
-  } catch (err) {
-    res.status(400).json({ message: "Invalid data", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch weather data from server" });
   }
 });
 

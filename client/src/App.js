@@ -1,41 +1,25 @@
 import "./App.css";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./components/HomePage/HomePage";
+import RegisterForm from "./components/RegisterForm/RegisterForm";
+import LoginForm from "./components/LoginForm/LoginForm";
+import Navbar from "./components/Navbar/Navbar";
+import UserDataContextProvider from "./contexts/UserDataContextProvider";
 
-function App() {
-  const [notes, setNotes] = useState(null);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:4000/notes")
-      .then((res) => {
-        console.log(res.data);
-        setNotes(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
-
+const App = () => {
   return (
-    <div className="App">
-      <h1>Notes</h1>
-      <div>
-        {notes ? (
-          notes.map((note) => {
-            return (
-              <div key={note._id}>
-                <h2>{note.title}</h2>
-                <p>{note.content}</p>
-              </div>
-            );
-          })
-        ) : (
-          <h2>Loading ...</h2>
-        )}
-      </div>
-    </div>
+    <Router>
+      <UserDataContextProvider>
+        <Navbar />
+        <Routes>
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      </UserDataContextProvider>
+    </Router>
   );
-}
+};
 
 export default App;

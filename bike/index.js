@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
-import Note from "./models/Note.js";
+import User from "./models/User.js";
 
 const app = express();
 
@@ -20,27 +20,37 @@ mongoose
     console.log(err);
   });
 
-app.get("/notes", async (req, res) => {
+app.get("/login/:userName/:password", async (req, res) => {
   try {
-    const notes = await Note.find();
-    res.status(200).json(notes);
+    if (!req.params.userName || !req.params.password) {
+      return res.status(400).json({ message: "Invalid data" });
+    }
+    const user = await User.findOne({
+      userName: req.params.userName,
+      password: req.params.password,
+    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
-app.post("/notes", async (req, res) => {
-  if (!req.body.title || !req.body.content) {
+app.post("/register", async (req, res) => {
+  if (!req.body.userName || !req.body.password) {
     return res.status(400).json({ message: "Invalid data" });
   }
-  const note = new Note({
-    title: req.body.title,
-    content: req.body.content,
+  const user = new User({
+    userName: req.body.userName,
+    password: req.body.password,
   });
 
   try {
-    const savedNote = await note.save();
-    res.status(201).json(savedNote);
+    const savedUser = await user.save();
+    res.status(201).json(savedUser);
   } catch (err) {
     res.status(400).json({ message: "Invalid data", error: err.message });
   }

@@ -20,15 +20,15 @@ services:
       - /app/node_modules
     environment:
       - MONGO_URL=mongodb://mongo:27017/mydb
-  runner:
-    build: ./runner
-    container_name: runner_c
+  bike:
+    build: ./bike
+    container_name: bike_c
     ports:
       - "4001:4001"
     depends_on:
       - mongo
     volumes:
-      - ./runner:/runner
+      - ./bike:/bike
       - /app/node_modules
     environment:
       - MONGO_URL=mongodb://mongo:27017/mydb
