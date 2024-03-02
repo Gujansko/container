@@ -30,10 +30,6 @@ input {
   flex-grow: 1;
 }
 
-.error {
-  color: red;
-}
-
 h2 {
   margin: 10px 0px;
   font-size: 2rem;

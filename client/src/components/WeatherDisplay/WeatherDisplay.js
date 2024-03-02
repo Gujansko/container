@@ -16,7 +16,7 @@ const WeatherDisplay = ({ weatherData, error }) => {
           </div>
         </div>
       ) : (
-        <p className="error">{error}</p>
+        <p className="error container">{error}</p>
       )}
     </div>
   );
