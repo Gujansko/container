@@ -52,3 +52,14 @@ h2 {
   font-weight: 600;
   color: #fff;
 }
+
+.submit:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+h3 {
+  margin: 10px;
+  font-size: 1.2rem;
+  font-weight: 500;
+}

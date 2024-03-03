@@ -12,23 +12,20 @@ const RegisterForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setUsername(username.trim());
-    setPassword(password.trim());
-
-    if (username.length < 3) {
+    if (username.trim().length < 3) {
       setError("Username must be at least 3 characters long");
       return;
     }
 
-    if (password.length < 3) {
+    if (password.trim().length < 3) {
       setError("Password must be at least 3 characters long");
       return;
     }
 
     axios
       .post(`http://localhost:4002/register`, {
-        userName: username,
-        password: password,
+        userName: username.trim(),
+        password: password.trim(),
       })
       .then((res) => {
         alert("Account created successfully!");

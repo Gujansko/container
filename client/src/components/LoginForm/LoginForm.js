@@ -15,21 +15,18 @@ const LoginForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setUsername(username.trim());
-    setPassword(password.trim());
-
-    if (username.length < 3) {
+    if (username.trim().length < 3) {
       setError("Username must be at least 3 characters long");
       return;
     }
 
-    if (password.length < 3) {
+    if (password.trim().length < 3) {
       setError("Password must be at least 3 characters long");
       return;
     }
 
     axios
-      .get(`http://localhost:4002/login/${username}/${password}`)
+      .get(`http://localhost:4002/login/${username.trim()}/${password.trim()}`)
       .then((res) => {
         alert("Logged in successfully!");
         updateUserDataContextValue({ userName: res.data.userName });

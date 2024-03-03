@@ -1,7 +1,8 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
-import User from "./models/User.js";
+import Distance from "./models/Distance.js";
+import Checkpoint from "./models/Checkpoint.js";
 
 const app = express();
 
@@ -20,39 +21,69 @@ mongoose
     console.log(err);
   });
 
-app.get("/login/:userName/:password", async (req, res) => {
+app.post("/checkpoint", async (req, res) => {
+  if (!req.body.name) {
+    return res.status(400).json({ message: "Name is required" });
+  }
   try {
-    if (!req.params.userName || !req.params.password) {
-      return res.status(400).json({ message: "Invalid data" });
-    }
-    const user = await User.findOne({
-      userName: req.params.userName,
-      password: req.params.password,
+    const checkpointExisting = await Checkpoint.findOne({
+      name: req.body.name,
     });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (checkpointExisting) {
+      return res.status(400).json({ message: "Checkpoint already exists" });
     }
 
-    res.status(200).json(user);
+    const checkpoint = await Checkpoint.create({ name: req.body.name });
+    res.status(201).json(checkpoint);
   } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
+    res.status(500).json({ message: "Failed to create checkpoint" });
   }
 });
 
-app.post("/register", async (req, res) => {
-  if (!req.body.userName || !req.body.password) {
-    return res.status(400).json({ message: "Invalid data" });
-  }
-  const user = new User({
-    userName: req.body.userName,
-    password: req.body.password,
-  });
-
+app.get("/checkpoints", async (req, res) => {
   try {
-    const savedUser = await user.save();
-    res.status(201).json(savedUser);
+    const checkpoints = await Checkpoint.find();
+    res.status(200).json(checkpoints);
   } catch (err) {
-    res.status(400).json({ message: "Invalid data", error: err.message });
+    res.status(500).json({ message: "Failed to fetch checkpoints" });
+  }
+});
+
+app.post("/distance", async (req, res) => {
+  if (!req.body.from || !req.body.to || !req.body.distance) {
+    return res
+      .status(400)
+      .json({ message: "From, to and distance are required" });
+  }
+  try {
+    const existingDistance = await Distance.findOne({
+      from: req.body.from,
+      to: req.body.to,
+    });
+    if (existingDistance) {
+      return res.status(400).json({ message: "Distance already exists" });
+    }
+
+    const checkpoints = [req.body.from, req.body.to].sort();
+
+    const distance = await Distance.create({
+      from: checkpoints[0],
+      to: checkpoints[1],
+      distance: Number(req.body.distance),
+    });
+
+    res.status(201).json(distance);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to create distance" });
+  }
+});
+
+app.get("/distances", async (req, res) => {
+  try {
+    const distances = await Distance.find();
+    res.status(200).json(distances);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch distances" });
   }
 });
 
