@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 mongoose
-  .connect("mongodb://mongo:27017/mydb", {
+  .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -22,7 +22,7 @@ mongoose
 app.get("/", async (req, res) => {
   try {
     fetch(
-      "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/%C5%81%C3%B3d%C5%BA%2C%2010%2C%20PL/today?unitGroup=metric&include=obs%2Ccurrent&key=AYV277Z85K8LCTMK9P8TQHG3X&contentType=json",
+      `https://api.openweathermap.org/data/2.5/weather?q=Lodz&APPID=${process.env.WEATHER_API_KEY}&units=metric`,
       {
         method: "GET",
         headers: {},
@@ -31,14 +31,18 @@ app.get("/", async (req, res) => {
       .then(async (response) => {
         const responseJson = await response.json();
         const data = {
-          conditions: responseJson.currentConditions.conditions,
-          temperature: responseJson.currentConditions.temp,
-          wind: responseJson.currentConditions.windspeed,
-          humidity: responseJson.currentConditions.humidity,
+          description: responseJson.weather[0].description,
+          icon: responseJson.weather[0].icon,
+          temperature: responseJson.main.temp,
+          humidity: responseJson.main.humidity,
+          wind: responseJson.wind.speed,
+          city: responseJson.name,
+          pressure: responseJson.main.pressure,
         };
         res.status(200).json(data);
       })
       .catch((err) => {
+        console.log(err);
         res
           .status(500)
           .json({ message: "Failed to fetch weather data from server" });

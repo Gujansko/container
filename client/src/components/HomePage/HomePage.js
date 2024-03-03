@@ -10,16 +10,17 @@ const HomePage = () => {
   const [weatherData, setWeatherData] = useState(null);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:4000/")
-      .then((res) => {
-        console.log(res);
+    const fetchData = async () => {
+      try {
+        const res = await axios.get("http://localhost:4000/");
         setWeatherData(res.data);
-      })
-      .catch((err) => {
+      } catch (err) {
         setError(err.response.data.message);
-      });
-  });
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
     <main>
       {userDataContextValue ? (
