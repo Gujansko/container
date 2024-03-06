@@ -5,6 +5,7 @@ import HomePage from "./components/HomePage/HomePage";
 import RegisterForm from "./components/RegisterForm/RegisterForm";
 import LoginForm from "./components/LoginForm/LoginForm";
 import CheckpointForm from "./components/CheckpointForm/CheckpointForm";
+import MeetingForm from "./components/MeetingForm/MeetingForm";
 import Navbar from "./components/Navbar/Navbar";
 import UserDataContextProvider from "./contexts/UserDataContextProvider";
 
@@ -18,6 +19,7 @@ const App = () => {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/checkpoint" element={<CheckpointForm />} />
+          <Route path="/create-meeting" element={<MeetingForm />} />
         </Routes>
       </UserDataContextProvider>
     </Router>

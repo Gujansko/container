@@ -22,9 +22,7 @@ const CheckpointForm = () => {
     axios
       .get("http://localhost:4001/checkpoints")
       .then((res) => {
-        console.log(res.data);
         const checkpoints = res.data.map((checkpoint) => {
-          console.log(checkpoint);
           return {
             name: checkpoint.name,
             id: checkpoint._id,
@@ -65,13 +63,23 @@ const CheckpointForm = () => {
         name: name.trim(),
       });
 
+      if (res.status !== 201) {
+        setError("Failed to create checkpoint");
+        return;
+      }
+
       const checkpointId = res.data._id;
       for (let i = 0; i < checkpoints.length; i++) {
-        await axios.post("http://localhost:4001/distance", {
+        const resDist = await axios.post("http://localhost:4001/distance", {
           from: checkpointId,
           to: checkpoints[i].id,
           distance: distance[i],
         });
+
+        if (resDist.status !== 201) {
+          setError("Failed to create distance");
+          return;
+        }
       }
 
       setError(null);

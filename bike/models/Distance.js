@@ -1,15 +1,16 @@
 import mongoose from "mongoose";
+import Checkpoint from "./Checkpoint.js";
 
 const DistanceSchema = new mongoose.Schema({
   from: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "Checkpoint",
+    ref: Checkpoint,
   },
   to: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "Checkpoint",
+    ref: Checkpoint,
   },
   distance: {
     type: Number,
