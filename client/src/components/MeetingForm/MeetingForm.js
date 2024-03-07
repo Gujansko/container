@@ -69,6 +69,14 @@ const MeetingForm = () => {
       return;
     }
 
+    for (let i = 0; i < chosenCheckpoints.length - 1; i++) {
+      if (chosenCheckpoints[i].id === chosenCheckpoints[i + 1].id) {
+        setError("Invalid meeting route, please choose different checkpoints");
+        return;
+      }
+    }
+
+    console.log(userDataContextValue.id);
     try {
       const res = await axios.post("http://localhost:4001/meeting", {
         checkpoints: chosenCheckpoints.map((checkpoint) => checkpoint.id),
@@ -102,6 +110,78 @@ const MeetingForm = () => {
       {checkpoints && distances ? (
         <div className="meeting-group-wrapper">
           <div className="groupper">
+            {chosenCheckpoints.length > 0 ? (
+              <>
+                {chosenCheckpoints.map((checkpoint, index) => (
+                  <div key={index} className="form-group">
+                    <label>{checkpoint.name}</label>
+                    <X
+                      size={24}
+                      className="delete-checkpoint"
+                      onClick={() => {
+                        if (chosenCheckpoints.length > 1) {
+                          if (index === chosenCheckpoints.length - 1) {
+                            const checkpointBefore =
+                              chosenCheckpoints[index - 1];
+
+                            if (checkpointBefore.id === checkpoint.id) {
+                              setChosenCheckpoints([]);
+                              setDistance(0);
+                              return;
+                            }
+
+                            const newDistance = distances.find(
+                              (distance) =>
+                                distance.from.id === checkpointBefore.id &&
+                                distance.to.id === checkpoint.id
+                            );
+                            if (!newDistance) {
+                              setError(
+                                `No distance found between ${checkpointBefore.name} and ${checkpoint.name}`
+                              );
+                              return;
+                            }
+                            setDistance(distance - newDistance.distance);
+                          } else {
+                            const checkpointAfter =
+                              chosenCheckpoints[index + 1];
+
+                            if (checkpointAfter.id === checkpoint.id) {
+                              setChosenCheckpoints([]);
+                              setDistance(0);
+                              return;
+                            }
+
+                            const newDistance = distances.find(
+                              (distance) =>
+                                distance.from.id === checkpoint.id &&
+                                distance.to.id === checkpointAfter.id
+                            );
+                            if (!newDistance) {
+                              setError(
+                                `No distance found between ${checkpoint.name} and ${checkpointAfter.name}`
+                              );
+                              return;
+                            }
+                            setDistance(distance - newDistance.distance);
+                          }
+                        }
+
+                        setChosenCheckpoints([
+                          ...chosenCheckpoints.slice(0, index),
+                          ...chosenCheckpoints.slice(index + 1),
+                        ]);
+                      }}
+                    />
+                  </div>
+                ))}
+              </>
+            ) : (
+              <h2>No chosen checkpoints</h2>
+            )}
+          </div>
+          <div className="groupper">
+            {checkpoints.length === 0 && <h2>No checkpoints found</h2>}
             {checkpoints.map((checkpoint, index) => (
               <>
                 {!(
@@ -147,68 +227,11 @@ const MeetingForm = () => {
               </>
             ))}
           </div>
-          <div className="groupper">
-            {chosenCheckpoints.length > 0 ? (
-              <>
-                {chosenCheckpoints.map((checkpoint, index) => (
-                  <div key={index} className="form-group">
-                    <label>{checkpoint.name}</label>
-                    <X
-                      size={24}
-                      className="delete-checkpoint"
-                      onClick={() => {
-                        if (chosenCheckpoints.length > 1) {
-                          if (index === chosenCheckpoints.length - 1) {
-                            const checkpointBefore =
-                              chosenCheckpoints[index - 1];
-                            const newDistance = distances.find(
-                              (distance) =>
-                                distance.from.id === checkpointBefore.id &&
-                                distance.to.id === checkpoint.id
-                            );
-                            if (!newDistance) {
-                              setError(
-                                `No distance found between ${checkpointBefore.name} and ${checkpoint.name}`
-                              );
-                              return;
-                            }
-                            setDistance(distance - newDistance.distance);
-                          } else {
-                            const checkpointAfter =
-                              chosenCheckpoints[index + 1];
-                            const newDistance = distances.find(
-                              (distance) =>
-                                distance.from.id === checkpoint.id &&
-                                distance.to.id === checkpointAfter.id
-                            );
-                            if (!newDistance) {
-                              setError(
-                                `No distance found between ${checkpoint.name} and ${checkpointAfter.name}`
-                              );
-                              return;
-                            }
-                            setDistance(distance - newDistance.distance);
-                          }
-                        }
-
-                        setChosenCheckpoints([
-                          ...chosenCheckpoints.slice(0, index),
-                          ...chosenCheckpoints.slice(index + 1),
-                        ]);
-                      }}
-                    />
-                  </div>
-                ))}
-                <h2>Current overall distance: {distance}km</h2>
-              </>
-            ) : (
-              <h2>No chosen checkpoints</h2>
-            )}
-          </div>
         </div>
       ) : (
         fetchFormError === false && <p>Loading data from server</p>
       )}
+      <h2>Current overall distance: {distance}km</h2>
       <div className="form-group">
         <label htmlFor="date">Date:</label>
         <input

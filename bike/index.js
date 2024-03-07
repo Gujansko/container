@@ -5,6 +5,7 @@ import Distance from "./models/Distance.js";
 import Checkpoint from "./models/Checkpoint.js";
 import Meeting from "./models/Meeting.js";
 import generateGoogleMapsLink from "./functions/generateGoogleMapsLink.js";
+import User from "./models/User.js";
 
 const app = express();
 
@@ -114,8 +115,22 @@ app.post("/meeting", async (req, res) => {
     const checkpoints = await Checkpoint.find({
       _id: { $in: req.body.checkpoints },
     });
-    if (checkpoints.length !== req.body.checkpoints.length) {
-      return res.status(400).json({ message: "Invalid checkpoint" });
+    if (
+      [...new Set(checkpoints)].length !==
+      [...new Set(req.body.checkpoints)].length
+    ) {
+      return res.status(400).json({
+        message: "Invalid checkpoint",
+        checkpoints,
+        req: req.body.checkpoints,
+      });
+    }
+
+    const attendees = await User.find({
+      _id: { $in: req.body.attendees },
+    });
+    if (attendees.length !== req.body.attendees.length) {
+      return res.status(400).json({ message: "Invalid attendee" });
     }
 
     const checkpointMap = new Map(
@@ -155,10 +170,73 @@ app.get("/meetings", async (req, res) => {
 
 app.get("/meetings/:userId", async (req, res) => {
   try {
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(400).json({ message: "Invalid user" });
+    }
+
     const meetings = await Meeting.find({ attendees: req.params.userId });
     res.status(200).json(meetings);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch meetings" });
+  }
+});
+
+app.post("/meeting/attend", async (req, res) => {
+  if (!req.body.meetingId || !req.body.userId) {
+    return res.status(400).json({ message: "Meeting and user are required" });
+  }
+  try {
+    const meeting = await Meeting.findById(req.body.meetingId);
+    if (!meeting) {
+      return res.status(400).json({ message: "Invalid meeting" });
+    }
+
+    const user = await User.findById(req.body.userId);
+    if (!user) {
+      return res.status(400).json({ message: "Invalid user" });
+    }
+
+    if (meeting.attendees.includes(req.body.userId)) {
+      return res.status(400).json({ message: "User already attending" });
+    }
+
+    meeting.attendees.push(req.body.userId);
+    await meeting.save();
+    res.status(200).json(meeting);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to attend meeting" });
+  }
+});
+
+app.post("/meeting/unattend", async (req, res) => {
+  if (!req.body.meetingId || !req.body.userId) {
+    return res.status(400).json({ message: "Meeting and user are required" });
+  }
+  try {
+    const meeting = await Meeting.findById(req.body.meetingId);
+    if (!meeting) {
+      return res.status(400).json({ message: "Invalid meeting" });
+    }
+
+    const user = await User.findById(req.body.userId);
+    if (!user) {
+      return res.status(400).json({ message: "Invalid user" });
+    }
+
+    if (!meeting.attendees.includes(req.body.userId)) {
+      return res.status(400).json({ message: "User not attending" });
+    }
+
+    meeting.attendees = meeting.attendees.filter(
+      (attendee) => attendee.toString() !== req.body.userId
+    );
+
+    await meeting.save();
+    res.status(200).json(meeting);
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ message: "Failed to unattend meeting" });
   }
 });
 

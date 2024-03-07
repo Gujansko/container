@@ -7,6 +7,7 @@ import LoginForm from "./components/LoginForm/LoginForm";
 import CheckpointForm from "./components/CheckpointForm/CheckpointForm";
 import MeetingForm from "./components/MeetingForm/MeetingForm";
 import Navbar from "./components/Navbar/Navbar";
+import Table from "./components/Table/Table";
 import UserDataContextProvider from "./contexts/UserDataContextProvider";
 
 const App = () => {
@@ -20,6 +21,8 @@ const App = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/checkpoint" element={<CheckpointForm />} />
           <Route path="/create-meeting" element={<MeetingForm />} />
+          <Route path="/meetings" element={<Table isUserTable={false} />} />
+          <Route path="/my-meetings" element={<Table isUserTable={true} />} />
         </Routes>
       </UserDataContextProvider>
     </Router>

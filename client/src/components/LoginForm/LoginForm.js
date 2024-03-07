@@ -29,7 +29,10 @@ const LoginForm = () => {
       .get(`http://localhost:4002/login/${username.trim()}/${password.trim()}`)
       .then((res) => {
         alert("Logged in successfully!");
-        updateUserDataContextValue({ userName: res.data.userName });
+        updateUserDataContextValue({
+          userName: res.data.userName,
+          id: res.data._id,
+        });
 
         setUsername("");
         setPassword("");

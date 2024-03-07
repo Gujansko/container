@@ -20,7 +20,7 @@ const Navbar = () => {
           {userDataContextValue ? (
             <>
               <li>
-                <Link to="/">
+                <Link to="/my-meetings">
                   <User size="20" />
                   <span>{userDataContextValue.userName}</span>
                 </Link>
