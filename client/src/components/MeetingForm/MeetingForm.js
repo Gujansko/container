@@ -124,12 +124,6 @@ const MeetingForm = () => {
                             const checkpointBefore =
                               chosenCheckpoints[index - 1];
 
-                            if (checkpointBefore.id === checkpoint.id) {
-                              setChosenCheckpoints([]);
-                              setDistance(0);
-                              return;
-                            }
-
                             const newDistance = distances.find(
                               (distance) =>
                                 distance.from.id === checkpointBefore.id &&
@@ -146,12 +140,6 @@ const MeetingForm = () => {
                             const checkpointAfter =
                               chosenCheckpoints[index + 1];
 
-                            if (checkpointAfter.id === checkpoint.id) {
-                              setChosenCheckpoints([]);
-                              setDistance(0);
-                              return;
-                            }
-
                             const newDistance = distances.find(
                               (distance) =>
                                 distance.from.id === checkpoint.id &&
@@ -165,12 +153,44 @@ const MeetingForm = () => {
                             }
                             setDistance(distance - newDistance.distance);
                           }
+                        } else {
+                          setDistance(0);
+                          setChosenCheckpoints([]);
+                          return;
                         }
 
-                        setChosenCheckpoints([
+                        const newCheckpoints = [
                           ...chosenCheckpoints.slice(0, index),
                           ...chosenCheckpoints.slice(index + 1),
-                        ]);
+                        ];
+                        const resultCheckpoints = [newCheckpoints[0]];
+
+                        for (let i = 0; i < newCheckpoints.length - 1; i++) {
+                          if (
+                            newCheckpoints[i].id !== newCheckpoints[i + 1].id
+                          ) {
+                            resultCheckpoints.push(newCheckpoints[i + 1]);
+                          }
+                        }
+                        if (
+                          newCheckpoints.length !== resultCheckpoints.length
+                        ) {
+                          let realDistance = 0;
+                          for (
+                            let i = 0;
+                            i < resultCheckpoints.length - 1;
+                            i++
+                          ) {
+                            const newDistance = distances.find(
+                              (distance) =>
+                                distance.from.id === resultCheckpoints[i].id &&
+                                distance.to.id === resultCheckpoints[i + 1].id
+                            );
+                            realDistance += newDistance.distance;
+                          }
+                          setDistance(realDistance);
+                        }
+                        setChosenCheckpoints(resultCheckpoints);
                       }}
                     />
                   </div>
@@ -231,7 +251,7 @@ const MeetingForm = () => {
       ) : (
         fetchFormError === false && <p>Loading data from server</p>
       )}
-      <h2>Current overall distance: {distance}km</h2>
+      <h2>Current overall distance: {distance.toFixed(2)}km</h2>
       <div className="form-group">
         <label htmlFor="date">Date:</label>
         <input

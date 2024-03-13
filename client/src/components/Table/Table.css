@@ -44,8 +44,16 @@ td {
   background-color: #f00;
 }
 
+.table-delete:hover {
+  background-color: #d00;
+}
+
 .table-add {
   background-color: #0f0;
+}
+
+.table-add:hover {
+  background-color: #0d0;
 }
 
 .wrap-action {

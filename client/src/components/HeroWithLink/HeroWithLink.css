@@ -21,4 +21,9 @@
   cursor: pointer;
   margin-top: 20px;
   color: #fff;
+  transition: 0.3s;
+}
+
+.activity-link:hover {
+  background-color: #444444;
 }
