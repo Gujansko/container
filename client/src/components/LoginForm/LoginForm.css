@@ -18,6 +18,8 @@
   gap: 10px;
   border-radius: 10px;
   min-width: 25%;
+  justify-content: space-around;
+  align-items: center;
 }
 
 label {

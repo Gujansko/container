@@ -18,6 +18,9 @@
   gap: 10px;
   border-radius: 10px;
   min-width: 25%;
+  justify-content: space-around;
+  align-items: center;
+  text-align: center;
 }
 
 label {
@@ -30,6 +33,10 @@ input {
   flex-grow: 1;
 }
 
+.error {
+  color: red;
+}
+
 h2 {
   margin: 10px 0px;
   font-size: 2rem;
@@ -40,7 +47,7 @@ h2 {
   padding: 10px 20px;
   border: none;
   border-radius: 15px;
-  background-color: #000;
+  background-color: #666;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: 0.3s;

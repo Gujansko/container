@@ -40,6 +40,9 @@ const Table = ({ isUserTable }) => {
       .get(serviceUrl)
       .then((res) => {
         setData(res.data);
+        if (res.data.length === 0) {
+          setError("No meetings found");
+        } else setError(null);
       })
       .catch((err) => {
         setError("Failed to fetch meetings");
@@ -57,6 +60,7 @@ const Table = ({ isUserTable }) => {
           meetingId: data._id,
           userId: userDataContextValue.id,
         });
+        setError(null);
       } catch (err) {
         setError(err.response.data.message);
         return;
@@ -66,6 +70,9 @@ const Table = ({ isUserTable }) => {
         .get(serviceUrl)
         .then((res) => {
           setData(res.data);
+          if (res.data.length === 0) {
+            setError("No meetings found");
+          } else setError(null);
         })
         .catch((err) => {
           setError("Failed to fetch meetings");
@@ -167,7 +174,7 @@ const Table = ({ isUserTable }) => {
       <h1>{isUserTable ? "My meetings" : "Meetings"}</h1>
       {error && <p className="error">{error}</p>}
       {data.length === 0 ? (
-        <h2>Loading data from server</h2>
+        <h2>{error === null ? "Loading data from server" : ""}</h2>
       ) : (
         <table {...getTableProps()}>
           <thead>
