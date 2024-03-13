@@ -173,7 +173,7 @@ const Table = ({ isUserTable }) => {
     <section>
       <h1>{isUserTable ? "My meetings" : "Meetings"}</h1>
       {error && <p className="error">{error}</p>}
-      {data.length === 0 ? (
+      {data && data.length === 0 ? (
         <h2>{error === null ? "Loading data from server" : ""}</h2>
       ) : (
         <table {...getTableProps()}>
